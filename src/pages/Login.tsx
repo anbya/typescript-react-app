@@ -11,13 +11,13 @@ import {
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import axiosInstance from '../api//axiosInstance'; 
 import CryptoJS from 'crypto-js';
+import { proceedLogin } from "../services/auth.service";
+import axiosInstance from '../api//axiosInstance'; 
 
 interface ApiResponse {
     [key: string]: any;
 }
-
 
 const Login: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -28,7 +28,7 @@ const Login: React.FC = () => {
 
     useEffect(() => {
         if (isAuthenticated === 'true') {
-        navigate("/dashboard");
+        navigate("/main");
         }
     }, [isAuthenticated, navigate]);
 
@@ -52,12 +52,20 @@ const Login: React.FC = () => {
             alert('Password cannot be empty!');
         } else {
             try {
-                const params = {
+                const loginData = {
                     email:email,
                     password:encryptData(password)
                 }
-                const response = await axiosInstance.post('/auth/web-login', params) as ApiResponse;
+                const response = await proceedLogin(loginData) as ApiResponse;
                 if(response.data.success == true){
+                    const userParams = {
+                        params:{
+                            id:response.data.user.id
+                        }
+                    }
+                    const userData = await axiosInstance.get('/users', userParams) as ApiResponse;
+                    localStorage.setItem('user',JSON.stringify(userData.data.data[0]))
+                    login()
                     alert('Login succeed.');
                 } else {
                     alert('Login failed!');

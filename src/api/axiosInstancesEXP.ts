@@ -1,14 +1,18 @@
 import axios, {
-  AxiosResponse,
-  AxiosError,
-  InternalAxiosRequestConfig,
-} from "axios";
+    AxiosResponse,
+    AxiosError,
+    InternalAxiosRequestConfig,
+  } from "axios";
 import { proceedRefreshToken } from "../services/auth.service";
+import { useAuth } from "../context/AuthContext";
+
+
+const { logout } = useAuth();
 
 const axiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
-  withCredentials: true,
-});
+    baseURL: process.env.REACT_APP_API_URL,
+    withCredentials: true,
+  });
 
 axiosInstance.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
@@ -21,6 +25,7 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => {
     return response;
@@ -39,9 +44,8 @@ axiosInstance.interceptors.response.use(
 
       if (response && !response.success) {
         alert("Token is expired, please try login again")
+        logout()
         setTimeout(() => {
-          localStorage.setItem('login','false')
-          localStorage.removeItem('user')
           window.location.reload();
         }, 7000);
       } else {

@@ -36,3 +36,9 @@
     transform: rotate(360deg);
   }
 }
+
+/* Mengubah warna saat hover */
+.navbar-nav .nav-link:hover,
+.navbar-nav .dropdown-menu .dropdown-item:hover {
+  color: #ddd !important; /* Ubah warna hover sesuai keinginan */
+}
